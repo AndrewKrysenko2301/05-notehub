@@ -43,7 +43,6 @@ function App() {
     <div className={css.app}>
       <header className={css.toolbar}>
         <SearchBox value={searchTerm} onChange={setSearchTerm} />
-
         {data && data.totalPages > 1 && (
           <Pagination
             pageCount={data.totalPages}
@@ -51,7 +50,6 @@ function App() {
             onPageChange={setPage}
           />
         )}
-
         <button className={css.button} onClick={openModal}>
           Create note +
         </button>

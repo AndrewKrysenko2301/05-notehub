@@ -1,13 +1,13 @@
+import type { Note } from "../../types/note";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteNote } from "../../services/noteService";
-import type { Note } from "../../types/note";
 import css from "./NoteList.module.css";
 
 interface NoteListProps {
   notes: Note[];
 }
 
-const NoteList: React.FC<NoteListProps> = ({ notes }) => {
+const NoteList = ({ notes }: NoteListProps) => {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation<{ message: string }, Error, string>({
@@ -15,11 +15,9 @@ const NoteList: React.FC<NoteListProps> = ({ notes }) => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notes"] }),
   });
 
-  if (!notes || notes.length === 0) return null;
-
   return (
     <ul className={css.list}>
-      {notes.map((note) => (
+      {notes.map((note: Note) => (
         <li key={note.id} className={css.listItem}>
           <h2 className={css.title}>{note.title}</h2>
           <p className={css.content}>{note.content}</p>
