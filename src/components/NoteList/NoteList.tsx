@@ -1,30 +1,20 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchNotes, deleteNote } from "../services/noteService";
-import { Note } from "../types/note";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteNote } from "../../services/noteService";
+import type { Note } from "../../types/note";
 import css from "./NoteList.module.css";
 
-const NoteList = () => {
+interface NoteListProps {
+  notes: Note[];
+}
+
+const NoteList: React.FC<NoteListProps> = ({ notes }) => {
   const queryClient = useQueryClient();
 
-  // Получение заметок
-  const {
-    data: notes,
-    isLoading,
-    error,
-  } = useQuery<Note[]>(["notes"], () => fetchNotes());
-
-  // Мутация удаления заметки
-  const deleteMutation = useMutation((id: string) => deleteNote(id), {
-    onSuccess: () => {
-      // Перезапросить список заметок после удаления
-      queryClient.invalidateQueries(["notes"]);
-    },
+  const deleteMutation = useMutation<{ message: string }, Error, string>({
+    mutationFn: (id: string) => deleteNote(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notes"] }),
   });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading notes</p>;
-
-  // Если нет заметок — ничего не рендерим
   if (!notes || notes.length === 0) return null;
 
   return (
