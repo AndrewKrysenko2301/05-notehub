@@ -19,12 +19,12 @@ function App() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch] = useDebounce(searchTerm, 500);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
-    setPage(0);
+    setPage(1);
   };
 
   const { data, isLoading, error } = useQuery<
@@ -32,7 +32,7 @@ function App() {
     Error
   >({
     queryKey: ["notes", page, debouncedSearch],
-    queryFn: () => fetchNotes(page + 1, PER_PAGE, debouncedSearch),
+    queryFn: () => fetchNotes(page, PER_PAGE, debouncedSearch),
     placeholderData: () =>
       queryClient.getQueryData<{ notes: Note[]; totalPages: number }>([
         "notes",
@@ -47,7 +47,8 @@ function App() {
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-        <SearchBox value={searchTerm} onChange={handleSearchChange} />
+        <SearchBox onChange={handleSearchChange} />
+
         {data && data.totalPages > 1 && (
           <Pagination
             pageCount={data.totalPages}
@@ -55,6 +56,7 @@ function App() {
             onPageChange={setPage}
           />
         )}
+
         <button className={css.button} onClick={openModal}>
           Create note +
         </button>
