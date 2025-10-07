@@ -19,7 +19,7 @@ function App() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch] = useDebounce(searchTerm, 500);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1); //
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSearchChange = (value: string) => {
@@ -36,7 +36,7 @@ function App() {
     placeholderData: () =>
       queryClient.getQueryData<{ notes: Note[]; totalPages: number }>([
         "notes",
-        page - 1,
+        page,
         debouncedSearch,
       ]),
   });
@@ -48,7 +48,6 @@ function App() {
     <div className={css.app}>
       <header className={css.toolbar}>
         <SearchBox onChange={handleSearchChange} />
-
         {data && data.totalPages > 1 && (
           <Pagination
             pageCount={data.totalPages}
@@ -56,7 +55,6 @@ function App() {
             onPageChange={setPage}
           />
         )}
-
         <button className={css.button} onClick={openModal}>
           Create note +
         </button>
