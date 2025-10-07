@@ -22,6 +22,11 @@ function App() {
   const [page, setPage] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setPage(0);
+  };
+
   const { data, isLoading, error } = useQuery<
     { notes: Note[]; totalPages: number },
     Error
@@ -42,7 +47,7 @@ function App() {
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-        <SearchBox value={searchTerm} onChange={setSearchTerm} />
+        <SearchBox value={searchTerm} onChange={handleSearchChange} />
         {data && data.totalPages > 1 && (
           <Pagination
             pageCount={data.totalPages}

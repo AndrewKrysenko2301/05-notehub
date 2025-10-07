@@ -7,7 +7,7 @@ import {
 import * as Yup from "yup";
 import css from "./NoteForm.module.css";
 import { createNote } from "../../services/noteService";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import type { CreateNoteDto } from "../../types/note";
 
 interface NoteFormProps {
@@ -28,6 +28,17 @@ const validationSchema = Yup.object({
 const NoteForm = ({ onClose }: NoteFormProps) => {
   const queryClient = useQueryClient();
 
+  const mutation = useMutation({
+    mutationFn: createNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      onClose();
+    },
+    onError: (error) => {
+      console.error("Error creating note:", error);
+    },
+  });
+
   return (
     <Formik
       initialValues={{
@@ -36,16 +47,16 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
         tag: "Todo" as CreateNoteDto["tag"],
       }}
       validationSchema={validationSchema}
-      onSubmit={async (values, { setSubmitting }) => {
-        try {
-          await createNote(values);
-          queryClient.invalidateQueries({ queryKey: ["notes"] });
-          onClose();
-        } catch (err) {
-          console.error(err);
-        } finally {
-          setSubmitting(false);
-        }
+      onSubmit={(values, { setSubmitting, resetForm }) => {
+        mutation.mutate(values, {
+          onSuccess: () => {
+            resetForm();
+            setSubmitting(false);
+          },
+          onSettled: () => {
+            setSubmitting(false);
+          },
+        });
       }}
     >
       {({ isSubmitting }) => (
@@ -103,11 +114,15 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
             <button
               type="submit"
               className={css.submitButton}
-              disabled={isSubmitting}
+              disabled={isSubmitting || mutation.isPending}
             >
-              Create note
+              {mutation.isPending ? "Creating..." : "Create note"}
             </button>
           </div>
+
+          {mutation.isError && (
+            <div className={css.error}>Something went wrong, try again.</div>
+          )}
         </Form>
       )}
     </Formik>
