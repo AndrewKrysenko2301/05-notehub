@@ -18,8 +18,8 @@ const Pagination: React.FC<PaginationProps> = ({
   return (
     <ReactPaginate
       pageCount={pageCount}
-      forcePage={currentPage}
-      onPageChange={(data) => onPageChange(data.selected)}
+      forcePage={currentPage - 1}
+      onPageChange={(data) => onPageChange(data.selected + 1)}
       previousLabel={"<"}
       nextLabel={">"}
       containerClassName={css.pagination}
